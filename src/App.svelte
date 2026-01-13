@@ -1,5 +1,7 @@
 <script>
+    import CreateTask from "./lib/CreateTask.svelte";
   import Header from "./lib/Header.svelte";
+    import TaskItem from "./lib/TaskItem.svelte";
 </script>
 
 <div>
@@ -8,7 +10,9 @@
 
 <main>
   <h1>Faites toi meme</h1>
-
+  <aside>
+        
+  </aside>
   <p>
     Check out <a
       href="https://github.com/sveltejs/kit#readme"
@@ -19,3 +23,5 @@
 
   <p class="read-the-docs">Click on the Vite and Svelte logos to learn more</p>
 </main>
+<CreateTask />
+<TaskItem />
