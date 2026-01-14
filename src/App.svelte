@@ -1,27 +1,27 @@
 <script>
-    import CreateTask from "./lib/CreateTask.svelte";
+  import { Router, Route } from "svelte-routing";
+
+  // pages
+  import HomePage from "./pages/HomePage.svelte";
+  import ListPage from "./pages/ListPage.svelte";
+  import ProfilePage from "./pages/ProfilePage.svelte";
+  // components
   import Header from "./lib/Header.svelte";
-    import TaskItem from "./lib/TaskItem.svelte";
+  import List from "./pages/List.svelte";
 </script>
 
-<div>
+<!--  responsavel por gerenciar as rotas e randerizar os componentes -->
+<Router>
   <Header />
-</div>
 
-<main>
-  <h1>Faites toi meme</h1>
-  <aside>
-        
-  </aside>
-  <p>
-    Check out <a
-      href="https://github.com/sveltejs/kit#readme"
-      target="_blank"
-      rel="noreferrer">SvelteKit</a
-    >, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">Click on the Vite and Svelte logos to learn more</p>
-</main>
-<CreateTask />
-<TaskItem />
+  <main class="container py-4">
+    <!-- pages -->
+    <Route path="/" component={HomePage} />
+    <Route path="/list" component={ListPage} />
+    <!-- components -->
+    <!-- vamos pasar o id da lista como parametro da rota -->
+    <Route path="/list/:id" component={List} />
+   
+    <Route path="/profile/:id" component={ProfilePage} />
+  </main>
+</Router>
