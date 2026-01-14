@@ -1,7 +1,8 @@
 <script>
   import { Router, Route } from "svelte-routing";
-
   // pages
+  import SignIn from "./pages/SignIn.svelte";
+  import Register from "./pages/Register.svelte";
   import HomePage from "./pages/HomePage.svelte";
   import ListPage from "./pages/ListPage.svelte";
   import ProfilePage from "./pages/ProfilePage.svelte";
@@ -13,10 +14,11 @@
 <!--  responsavel por gerenciar as rotas e randerizar os componentes -->
 <Router>
   <Header />
-
   <main class="container py-4">
     <!-- pages -->
-    <Route path="/" component={HomePage} />
+    <Route path="/" component={SignIn} />
+    <Route path="/register" component={SignIn} />
+    <Route path="/home" component={HomePage} />
     <Route path="/list" component={ListPage} />
     <!-- components -->
     <!-- vamos pasar o id da lista como parametro da rota -->

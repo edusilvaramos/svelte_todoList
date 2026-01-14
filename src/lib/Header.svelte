@@ -19,7 +19,7 @@
     <div class="collapse navbar-collapse" id="navbarColor03">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <Link class="nav-link active" to="/">Home</Link>
+          <Link class="nav-link active" to="/home">Home</Link>
         </li>
         <li class="nav-item">
           <Link class="nav-link" to="/list">Lists to do</Link>
