@@ -13,11 +13,14 @@
 
 <!--  responsavel por gerenciar as rotas e randerizar os componentes -->
 <Router>
-  <Header />
+  <!-- {#if } -->
+	  <Header />
+  <!-- {/if} -->
+
   <main class="container py-4">
     <!-- pages -->
     <Route path="/" component={SignIn} />
-    <Route path="/register" component={SignIn} />
+    <Route path="/register" component={Register} />
     <Route path="/home" component={HomePage} />
     <Route path="/list" component={ListPage} />
     <!-- components -->

@@ -24,6 +24,12 @@
         <li class="nav-item">
           <Link class="nav-link" to="/list">Lists to do</Link>
         </li>
+        <li class="nav-item">
+          <Link class="nav-link" to="/register">Create account</Link>
+        </li>
+        <li class="nav-item">
+          <Link class="nav-link" to="/signin">Sign In</Link>
+        </li>
       </ul>
       <div class="g-2">
         <Link to="/login" class="text-dark">
