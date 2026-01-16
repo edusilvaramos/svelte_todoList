@@ -6,4 +6,4 @@
 <h1>Lista: {id}</h1>
 <p>Aqui vamos editar os itens e sublistas.</p>
 
-<Link to="/home">← Voltar</Link>
+<Link to="/home">Voltar</Link>

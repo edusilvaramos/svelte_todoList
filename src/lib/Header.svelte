@@ -1,5 +1,7 @@
 <script>
-  import { Link } from "svelte-routing";
+  import { Link, useLocation } from "svelte-routing";
+  // the useLocation is a hook to get the current path for active link. returns a store
+  const location = useLocation();
 </script>
 
 <nav class="navbar navbar-expand-lg bg-light" data-bs-theme="light">
@@ -19,16 +21,16 @@
     <div class="collapse navbar-collapse" id="navbarColor03">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <Link class="nav-link active" to="/home">Home</Link>
+          <Link class="nav-link {$location.pathname === '/home' ? 'active' : ''}" to="/home">Home</Link>
         </li>
         <li class="nav-item">
-          <Link class="nav-link" to="/list">Lists to do</Link>
+          <Link class="nav-link {$location.pathname === '/list' ? 'active' : ''}" to="/list">Lists to do</Link>
         </li>
         <li class="nav-item">
-          <Link class="nav-link" to="/register">Create account</Link>
+          <Link class="nav-link {$location.pathname === '/register' ? 'active' : ''}" to="/register">Create account</Link>
         </li>
         <li class="nav-item">
-          <Link class="nav-link" to="/signin">Sign In</Link>
+          <Link class="nav-link {$location.pathname === '/signin' ? 'active' : ''}" to="/signin">Sign In</Link>
         </li>
       </ul>
       <div class="g-2">

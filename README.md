@@ -33,5 +33,6 @@ npm run dev
 - https://bootswatch.com/litera/
 - https://icons.getbootstrap.com
 - https://github.com/sveltejs/svelte/issues/11021
+- https://github.com/mefechoel/svelte-navigator?tab=readme-ov-file
 
 ps: svelte-routing works correctly with Svelte 4. For projects using Svelte 5, it is recommended to use SvelteKit, which is the official routing solution in the Svelte ecosystem.So we will use svelte-routing in this project, vertion 4.
