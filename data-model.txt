@@ -1,0 +1,75 @@
+DATA MODEL — LocalStorage persistence
+
+LocalStorage key:
+todoLists_v1
+
+
+ROOT OBJECT
+
+{
+  version: number
+  lists: List[]
+  ui: UiPreferences
+}
+
+
+UI PREFERENCES
+
+# para guardar as preferências de exibição do usuário, como filtros e ordenação
+UiPreferences
+  hideDone: boolean
+  selectedTag: string | null
+  sortBy: "createdAt" | "updatedAt" | "title"
+
+
+LIST
+
+# the mother list ! that contains tasks and sublists
+List
+  id: string
+  title: string
+  tags: string[]
+  createdAt: number
+  updatedAt: number
+  items: Item[]
+
+
+# um item pode ser uma tarefa ou uma sublista
+ITEM (union type)
+
+Item
+  type: "task" | "list"
+  id: string
+  tags: string[]
+
+
+TASK ITEM
+
+TaskItem
+  type: "task"
+  id: string
+  title: string
+  note: string
+  done: boolean
+  priority: 1 | 2 | 3 etc 
+  dueDate?: string  ex: (YYYY-MM-DD)
+  dueTime?: string  ex : (HH:mm)
+  tags: string[]
+
+
+SUB LIST ITEM (recursive)
+
+SubListItem
+  type: "list"
+  id: string
+  title: string
+  tags: string[]
+  items: Item[]
+
+
+NOTES
+
+- Lists contain Items.
+- Items can be either tasks or sub-lists.
+- Sub-lists allow recursive list structures.
+- UI preferences are saved separately in "ui".

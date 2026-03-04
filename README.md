@@ -54,5 +54,6 @@ For more information, visit the [Supabase Auth documentation](https://supabase.c
 - https://github.com/sveltejs/svelte/issues/11021
 - https://github.com/mefechoel/svelte-navigator?tab=readme-ov-file
 - https://supabase.com/docs/reference/javascript/initializing
+- https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API
 
 ps: svelte-routing works correctly with Svelte 4. For projects using Svelte 5, it is recommended to use SvelteKit, which is the official routing solution in the Svelte ecosystem.So we will use svelte-routing in this project, vertion 4.
