@@ -1,32 +1,41 @@
 <script>
   import { Router, Route } from "svelte-routing";
-  // pages
+  import { onMount } from 'svelte';
   import SignIn from "./pages/SignIn.svelte";
   import Register from "./pages/Register.svelte";
   import HomePage from "./pages/HomePage.svelte";
   import ListPage from "./pages/ListPage.svelte";
   import ProfilePage from "./pages/ProfilePage.svelte";
-  // components
-  import Header from "./lib/Header.svelte";
   import List from "./pages/List.svelte";
+  import Header from "./lib/Header.svelte";
+  import ProtectedRoute from "./lib/auth/ProtectedRoute.svelte";
+  import { user, isLoading, initAuth } from "./lib/auth/authStore.js";
+
+  onMount(() => {
+    initAuth();
+  });
 </script>
 
-<!--  responsavel por gerenciar as rotas e randerizar os componentes -->
 <Router>
-  <!-- {#if } -->
-	  <Header />
-  <!-- {/if} -->
+  {#if !$isLoading}
+    <Header />
+  {/if}
 
   <main class="container py-4">
-    <!-- pages -->
-    <Route path="/" component={SignIn} />
-    <Route path="/register" component={Register} />
-    <Route path="/home" component={HomePage} />
-    <Route path="/list" component={ListPage} />
-    <!-- components -->
-    <!-- vamos pasar o id da lista como parametro da rota -->
-    <Route path="/list/:id" component={List} />
-   
-    <Route path="/profile/:id" component={ProfilePage} />
+    {#if $isLoading}
+      <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    {:else}
+      <Route path="/" component={SignIn} />
+      <Route path="/register" component={Register} />
+
+      <ProtectedRoute path="/home" component={HomePage} />
+      <ProtectedRoute path="/list" component={ListPage} />
+      <ProtectedRoute path="/list/:id" component={List} />
+      <ProtectedRoute path="/profile/:id" component={ProfilePage} />
+    {/if}
   </main>
 </Router>

@@ -1,12 +1,33 @@
 <script>
-  import { Link, useLocation } from "svelte-routing";
+  import { Link, useLocation, navigate } from "svelte-routing";
+  import { user, logout } from './auth/authStore.js';
+  import logo from '../assets/logo.svg';
+  
   // the useLocation is a hook to get the current path for active link. returns a store
   const location = useLocation();
+  
+  let isLoggingOut = false;
+
+  async function handleLogout() {
+    isLoggingOut = true;
+    try {
+      const { error } = await logout();
+      if (!error) {
+        navigate('/');
+      }
+    } catch (err) {
+      console.error('Error logging out:', err);
+    } finally {
+      isLoggingOut = false;
+    }
+  }
 </script>
 
 <nav class="navbar navbar-expand-lg bg-light" data-bs-theme="light">
   <div class="container-fluid">
-    <Link class="navbar-brand" to="/">nome e/ou brand</Link>
+    <Link class="navbar-brand" to="/"><img src={logo} alt="Faite Toi Même logo" width="180"></Link>
+    
+
     <button
       class="navbar-toggler"
       type="button"
@@ -20,27 +41,38 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarColor03">
       <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <Link class="nav-link {$location.pathname === '/home' ? 'active' : ''}" to="/home">Home</Link>
-        </li>
-        <li class="nav-item">
-          <Link class="nav-link {$location.pathname === '/list' ? 'active' : ''}" to="/list">Lists to do</Link>
-        </li>
-        <li class="nav-item">
-          <Link class="nav-link {$location.pathname === '/register' ? 'active' : ''}" to="/register">Create account</Link>
-        </li>
-        <li class="nav-item">
-          <Link class="nav-link {$location.pathname === '/signin' ? 'active' : ''}" to="/signin">Sign In</Link>
-        </li>
+        {#if $user}
+          <li class="nav-item">
+            <Link class="nav-link {$location.pathname === '/home' ? 'active' : ''}" to="/home">Home</Link>
+          </li>
+          <li class="nav-item">
+            <Link class="nav-link {$location.pathname === '/list' ? 'active' : ''}" to="/list">Lists to do</Link>
+          </li>
+          <li class="nav-item">
+            <Link class="nav-link {$location.pathname.startsWith('/profile') ? 'active' : ''}" to="/profile/{$user.id}">Profile</Link>
+          </li>
+        {/if}
       </ul>
-      <div class="g-2">
-        <Link to="/login" class="text-dark">
-          <i class="bi bi-person-fill fs-2"></i>
-        </Link>
-        <!-- podemos mostrar a listas de users que o admon vai criar para atrubuir as taches-->
-        <Link to="/registerPerson" class="text-dark">
-          <i class="bi bi-people-fill fs-2"></i>
-        </Link>
+      <div class="g-2 d-flex align-items-center gap-3">
+        {#if $user}
+          <span class="text-muted small">
+            {$user.email}
+          </span>
+          <button 
+            class="btn btn-outline-danger btn-sm"
+            on:click={handleLogout}
+            disabled={isLoggingOut}
+          >
+            {isLoggingOut ? 'Saindo...' : 'Sair'}
+          </button>
+        {:else}
+          <Link to="/" class="btn btn-primary btn-sm">
+            Sign In
+          </Link>
+          <Link to="/register" class="btn btn-outline-primary btn-sm">
+            Sign Up
+          </Link>
+        {/if}
       </div>
     </div>
   </div>
