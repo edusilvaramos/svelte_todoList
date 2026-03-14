@@ -1,51 +1,78 @@
 # Svelte Todo List
 
-A todo list application built with Svelte.
+A simple todo list application built with Svelte and Vite.
 
 ## Requirements
 
-- **Node.js**: v16 or higher
-- **npm**: v7 or higher
+- Node.js 16 or later
+- npm 7 or later
 
-## Setup
+## Installation
 
-1. Clone the repository or navigate to the project directory:
+1. Move into the project folder:
+
 ```bash
 cd svelte_todoList
 ```
 
-2. Install dependencies:
+2. Install the dependencies:
+
 ```bash
 npm install
 ```
 
-## Run the Application
+## Environment Variables
+
+This project uses Supabase for authentication. Before starting the app, make sure your environment file includes the following variables:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+These values are loaded from `.env` or `.env.local`.
+
+## Development
 
 Start the development server:
+
 ```bash
 npm run dev
 ```
 
+Vite will print the local URL in the terminal, usually `http://localhost:5173`.
+
+## Production Build
+
+Create a production build:
+
+```bash
+npm run build
+```
+
+Preview the production build locally:
+
+```bash
+npm run preview
+```
 
 ## Authentication
 
-This project uses **Supabase Auth** for secure user authentication, including:
+This project uses Supabase Auth for:
+
 - User registration
-- Login with email and password
+- Email and password sign-in
 - Session management
-- Logout functionality
-- forgot password flow
+- Logout
+- Password reset flow
 
-The Svelte application communicates with Supabase using the [Supabase JavaScript SDK](https://supabase.com/docs/reference/javascript/initializing).
+The application communicates with Supabase through the [Supabase JavaScript SDK](https://supabase.com/docs/reference/javascript/initializing).
 
-**Why Supabase?**
-Supabase provides secure password hashing, protected authentication flows, and email-based authentication without exposing sensitive data in the browser.
+Supabase handles password hashing and authentication flows securely, which keeps sensitive logic out of the client application.
 
-For more information, visit the [Supabase Auth documentation](https://supabase.com/docs/guides/auth).
+For more details, see the [Supabase Auth documentation](https://supabase.com/docs/guides/auth).
 
-
-
-## Documentation & References
+## Documentation and References
 
 - https://github.com/EmilTholin/svelte-routing
 - https://svelte.dev/docs/svelte/overview
@@ -56,4 +83,6 @@ For more information, visit the [Supabase Auth documentation](https://supabase.c
 - https://supabase.com/docs/reference/javascript/initializing
 - https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API
 
-ps: svelte-routing works correctly with Svelte 4. For projects using Svelte 5, it is recommended to use SvelteKit, which is the official routing solution in the Svelte ecosystem.So we will use svelte-routing in this project, vertion 4.
+## Notes
+
+This project uses `svelte-routing`, which works well with Svelte 4. For new projects built with Svelte 5, SvelteKit is generally the recommended routing solution.
