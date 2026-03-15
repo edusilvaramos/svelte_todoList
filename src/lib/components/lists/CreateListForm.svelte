@@ -11,6 +11,8 @@
   function handleSave() {
     if (!newTitle.trim()) return;
 
+    const now = Date.now();
+
     // Convert comma-separated input into a clean tags array.
     const formattedTags = newTags
       .split(',')
@@ -22,7 +24,9 @@
       title: newTitle.trim(),
       description: newDescription.trim(),
       tags: formattedTags,
-      itens: []
+      createdAt: now,
+      updatedAt: now,
+      items: []
     };
 
     dispatch('save', newList);
