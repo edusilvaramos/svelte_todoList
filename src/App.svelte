@@ -4,13 +4,13 @@
   import SignIn from "./pages/SignIn.svelte";
   import Register from "./pages/Register.svelte";
   import HomePage from "./pages/HomePage.svelte";
-  import ListPage from "./pages/ListPage.svelte";
   import ProfilePage from "./pages/ProfilePage.svelte";
   import List from "./pages/List.svelte";
   import Header from "./lib/Header.svelte";
   import ProtectedRoute from "./lib/auth/ProtectedRoute.svelte";
   import { user, isLoading, initAuth } from "./lib/auth/authStore.js";
 
+  // Initialize auth state as soon as the app is mounted.
   onMount(() => {
     initAuth();
   });
@@ -32,8 +32,8 @@
       <Route path="/" component={SignIn} />
       <Route path="/register" component={Register} />
 
+      <!-- Private pages are only accessible for authenticated users. -->
       <ProtectedRoute path="/home" component={HomePage} />
-      <ProtectedRoute path="/list" component={ListPage} />
       <ProtectedRoute path="/list/:id" component={List} />
       <ProtectedRoute path="/profile/:id" component={ProfilePage} />
     {/if}
