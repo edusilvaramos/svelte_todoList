@@ -1,13 +1,29 @@
 <script>
-  import { navigate } from 'svelte-routing';
-  import { listsStore } from '../lib/stores/listsStore.js';
+  import { navigate } from "svelte-routing";
+  import { listsStore } from "../lib/stores/listsStore.js";
 
   export let id;
+
+  let newTaskTitle = "";
 
   $: currentList = $listsStore.find((list) => list.id === id);
 
   function goBack() {
-    navigate('/home');
+    navigate("/home");
+  }
+
+  function addTask() {
+    if (!newTaskTitle.trim()) return;
+
+    const newTask = {
+      id: crypto.randomUUID(),
+      title: newTaskTitle.trim(),
+      done: false,
+      type: "task",
+    };
+
+    currentList.items = [...currentList.items, newTask];
+    newTaskTitle = "";
   }
 </script>
 
@@ -35,6 +51,18 @@
       <div class="card shadow-sm mt-4">
         <div class="card-body">
           <h2 class="h5 mb-3">Tasks</h2>
+          <div class="d-flex gap-2 mb-3">
+            <input
+              class="form-control"
+              type="text"
+              bind:value={newTaskTitle}
+              placeholder="Add a new task"
+            />
+
+            <button class="btn btn-primary" on:click={addTask}>
+              Add Task
+            </button>
+          </div>
 
           {#if currentList.items.length === 0}
             <p class="text-muted mb-0">No tasks yet.</p>

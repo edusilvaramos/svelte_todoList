@@ -25,7 +25,7 @@
 
 <nav class="navbar navbar-expand-lg bg-light" data-bs-theme="light">
   <div class="container-fluid">
-    <Link class="navbar-brand" to="/"><img src={logo} alt="Faite Toi Même logo" width="180"></Link>
+    <Link class="navbar-brand" to="/"><img src={logo} alt="Do It Yourself logo" width="180"></Link>
     
 
     <button
@@ -63,7 +63,7 @@
             on:click={handleLogout}
             disabled={isLoggingOut}
           >
-            {isLoggingOut ? 'Saindo...' : 'Sair'}
+            {isLoggingOut ? 'Signing out...' : 'Sign out'}
           </button>
         {:else}
           <Link to="/" class="btn btn-primary btn-sm">
