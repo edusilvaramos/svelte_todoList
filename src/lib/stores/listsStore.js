@@ -1,7 +1,22 @@
 import { writable } from 'svelte/store';
 import { loadLists, saveLists } from '../services/listsStorage.js';
 
+// Normalize each task so UI logic can rely on a stable shape,
+// including defaults for fields introduced after older data was saved.
+function normalizeTask(item) {
+  if (!item || typeof item !== 'object') {
+    return item;
+  }
 
+  return {
+    ...item,
+    recurrence: typeof item.recurrence === 'string' ? item.recurrence : 'none'
+  };
+}
+
+
+// Normalize list-level data and item collections loaded from storage,
+// so legacy keys and missing timestamps do not break current behavior.
 function normalizeList(list) {
   const now = Date.now();
   let normalizedItems = [];
@@ -16,7 +31,7 @@ function normalizeList(list) {
     ...list,
     createdAt: Number.isFinite(list?.createdAt) ? list.createdAt : now,
     updatedAt: Number.isFinite(list?.updatedAt) ? list.updatedAt : now,
-    items: normalizedItems
+    items: normalizedItems.map(normalizeTask)
   };
 }
 
@@ -29,7 +44,7 @@ function withUpdatedTimestamp(list, changes) {
 }
 
 const storedLists = loadLists();
-const initialLists = (storedLists).map(normalizeList);
+const initialLists = (storedLists ?? []).map(normalizeList);
 
 function createListsStore() {
   // Expose a custom store API with persistence helpers.
