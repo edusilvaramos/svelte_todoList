@@ -46,9 +46,6 @@
             <Link class="nav-link {$location.pathname === '/home' ? 'active' : ''}" to="/home">Home</Link>
           </li>
           <li class="nav-item">
-            <Link class="nav-link {$location.pathname === '/list' ? 'active' : ''}" to="/list">Lists to do</Link>
-          </li>
-          <li class="nav-item">
             <Link class="nav-link {$location.pathname.startsWith('/profile') ? 'active' : ''}" to="/profile/{$user.id}">Profile</Link>
           </li>
         {/if}
