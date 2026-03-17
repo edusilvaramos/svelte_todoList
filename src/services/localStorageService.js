@@ -28,7 +28,7 @@ export function loadDB() {
       version: Number.isInteger(parsed.version) ? parsed.version : STORAGE_VERSION
     };
   } catch (error) {
-    console.error('Erro ao carregar localStorage:', error);
+    console.error('Error loading from localStorage:', error);
     return createEmptyDB();
   }
 }
@@ -38,7 +38,7 @@ export function saveDB(db) {
     // Save full database object in one write operation.
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
   } catch (error) {
-    console.error('Erro ao salvar no localStorage:', error);
+    console.error('Error saving to localStorage:', error);
   }
 }
 
