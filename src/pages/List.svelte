@@ -3,19 +3,44 @@
   import { listsStore } from "../lib/stores/listsStore.js";
   import TaskForm from "../lib/components/items/TaskForm.svelte";
   import TaskItem from "../lib/components/items/TaskItem.svelte";
+  import CreateListForm from "../lib/components/lists/CreateListForm.svelte";
+  import ListCard from "../lib/components/lists/ListCard.svelte";
 
-
+  // In Svelte, exported variables are props from the parent/router.
   export let id;
-  
-  //  bind:value keeps the input field and the title variable in sync automatically. 
-  $: currentList = $listsStore.find((list) => list.id === id);
+
+  // Find a list by id, including sublists inside other lists.
+  function findListById(lists, targetId) {
+    for (const list of lists) {
+      if (list.id === targetId) {
+        return list;
+      }
+
+      const nestedLists = (list.items ?? []).filter(
+        (item) => item?.type === "list",
+      );
+      const found = findListById(nestedLists, targetId);
+
+      if (found) {
+        return found;
+      }
+    }
+
+    return null;
+  }
+
+  // `$:` means reactive code: it runs again when values change.
+  // `$listsStore` is Svelte auto-subscribe syntax for a store value.
+  $: currentList = findListById($listsStore, id);
 
   function goBack() {
     navigate("/home");
   }
 
+  // Create a task from form data and add it to the current list.
   function handleTaskSubmit(event) {
-    const { title, notes, dueDate, dueTime, priority, status, recurrence } = event.detail;
+    const { title, notes, dueDate, dueTime, priority, status, recurrence } =
+      event.detail;
 
     const newTask = {
       id: crypto.randomUUID(),
@@ -35,6 +60,7 @@
     });
   }
 
+  // Mark task done/undone and create next task if it is recurring.
   function handleToggleTaskDone(event) {
     const { taskId, done } = event.detail;
 
@@ -72,6 +98,7 @@
     });
   }
 
+  // Get the next date for daily/weekly/monthly recurrence.
   function getNextDueDate(dueDate, recurrence) {
     if (!dueDate) return "";
 
@@ -94,6 +121,24 @@
   function toggleCreateForm() {
     showCreateForm = !showCreateForm;
   }
+
+  let showCreateSubListForm = false;
+
+  function toggleCreateSubListForm() {
+    showCreateSubListForm = !showCreateSubListForm;
+  }
+
+  // Build a new sublist object and add it to this list.
+  function handleSubListSave(event) {
+    const subList = {
+      ...event.detail,
+      type: "list",
+      items: event.detail.items ?? [],
+    };
+
+    currentList.items = [...currentList.items, subList];
+    showCreateSubListForm = false;
+  }
 </script>
 
 <section class="py-4">
@@ -102,6 +147,7 @@
       Back to Home
     </button>
 
+    <!-- `{#if ...}` renders this block only when condition is true. -->
     {#if currentList}
       <h1 class="mb-2">{currentList.title}</h1>
 
@@ -111,6 +157,7 @@
 
       {#if currentList.tags?.length}
         <div class="d-flex flex-wrap gap-2 mt-3 mb-4">
+          <!-- `{#each ...}` is Svelte loop syntax. -->
           {#each currentList.tags as tag}
             <span class="badge bg-light text-dark border">{tag}</span>
           {/each}
@@ -120,22 +167,47 @@
       <div class="card shadow-sm mt-4">
         <div class="card-body">
           <h2 class="h5 mb-3">Tasks</h2>
-          <button class="btn btn-primary" on:click={toggleCreateForm}>
-            Create Task
+          <button
+            class="btn btn-outline-primary me-2"
+            on:click={toggleCreateForm}
+          >
+            New Task
+          </button>
+
+          <button
+            class="btn btn-outline-secondary"
+            on:click={toggleCreateSubListForm}
+          >
+            New Sublist
           </button>
 
           {#if showCreateForm}
+            <!-- `on:submit` listens to a custom event from TaskForm. -->
             <TaskForm on:submit={handleTaskSubmit} />
+          {/if}
+          {#if showCreateSubListForm}
+            <div class="mt-3">
+              <!-- `on:save` and `on:cancel` are custom events from child component. -->
+              <CreateListForm
+                on:save={handleSubListSave}
+                on:cancel={toggleCreateSubListForm}
+              />
+            </div>
           {/if}
 
           {#if currentList.items.length === 0}
-            <p class="text-muted mb-0">No tasks yet.</p>
+            <p class="text-muted mb-0">No items yet.</p>
           {:else}
-            <ul class="list-group list-group-flush">
+            <div class="mt-3 d-flex flex-column gap-3">
               {#each currentList.items as item}
-                <TaskItem {item} on:toggleDone={handleToggleTaskDone} />
+                {#if item.type === "task"}
+                  <!-- `{item}` passes prop with same name: item={item}. -->
+                  <TaskItem {item} on:toggleDone={handleToggleTaskDone} />
+                {:else if item.type === "list"}
+                  <ListCard list={item} />
+                {/if}
               {/each}
-            </ul>
+            </div>
           {/if}
         </div>
       </div>
