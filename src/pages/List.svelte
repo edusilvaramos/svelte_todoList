@@ -5,37 +5,56 @@
   import TaskItem from "../lib/components/items/TaskItem.svelte";
   import CreateListForm from "../lib/components/lists/CreateListForm.svelte";
   import ListCard from "../lib/components/lists/ListCard.svelte";
+  import { Link } from "svelte-routing";
+  import Breadcrumb from "../lib/components/navigation/Breadcrumb.svelte";
 
   // In Svelte, exported variables are props from the parent/router.
   export let id;
 
   // Find a list by id, including sublists inside other lists.
-  function findListById(lists, targetId) {
+  function findPathToList(lists, targetId, currentPath = []) {
     for (const list of lists) {
+      const newPath = [...currentPath, list];
+
       if (list.id === targetId) {
-        return list;
+        return newPath;
       }
 
       const nestedLists = (list.items ?? []).filter(
         (item) => item?.type === "list",
       );
-      const found = findListById(nestedLists, targetId);
+      const foundPath = findPathToList(nestedLists, targetId, newPath);
 
-      if (found) {
-        return found;
+      if (foundPath) {
+        return foundPath;
       }
     }
 
     return null;
   }
 
-  // `$:` means reactive code: it runs again when values change.
-  // `$listsStore` is Svelte auto-subscribe syntax for a store value.
-  $: currentList = findListById($listsStore, id);
+  // `$:`  reactive code: it runs again automatically when its values change. :) Svelte !!
+  // `$listsStore` is Svelte auto-subscribe syntax: reads the current store value.
+  // if the result is null, use an empty array instead.
+  $: currentPath = findPathToList($listsStore, id) ?? [];
+
+  // Get the last item of the path array = the list we are currently viewing.
+  // if the array is empty, use null instead.
+  $: currentList = currentPath[currentPath.length - 1] ?? null;
 
   function goBack() {
     navigate("/home");
   }
+
+  // so breadcrumbItems is a flat list: [Home, parent list, current list].
+  $: breadcrumbItems = [
+    { label: "Home", href: "/home" },
+    // puts all items from currentPath into the same array,
+    ...currentPath.map((list) => ({
+      label: list.title,
+      href: `/list/${list.id}`,
+    })),
+  ];
 
   // Create a task from form data and add it to the current list.
   function handleTaskSubmit(event) {
@@ -142,6 +161,7 @@
 </script>
 
 <section class="py-4">
+  <Breadcrumb items={breadcrumbItems} />Breadcrumb
   <div class="container">
     <button class="btn btn-outline-secondary btn-sm mb-4" on:click={goBack}>
       Back to Home
