@@ -30,9 +30,19 @@ VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
+ps: Go to supabase https://supabase.com
+Create a Project, then go to Project Settings > API and copy the URL and anon key.
+
 These values are loaded from `.env` or `.env.local`.
 
-## Development
+## Build the application:
+```bash
+npm run build
+```
+## Start the development server:
+```bash
+npm run dev
+```
 
 Start the development server:
 
