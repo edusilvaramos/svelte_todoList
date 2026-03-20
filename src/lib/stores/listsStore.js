@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import { loadLists, saveLists } from "../services/listsStorage.js";
+import { loadDB, saveDB } from "../../services/localStorageService.js";
 
 // Make sure each task has all fields the app expects.
 function normalizeTask(item) {
@@ -40,7 +40,6 @@ function normalizeList(list) {
   } else if (Array.isArray(list?.itens)) {
     normalizedItems = list.itens;
   }
-
   return {
     ...list,
     type: "list",
@@ -125,8 +124,16 @@ function deleteNestedList(list, targetId) {
   });
 }
 
-const storedLists = loadLists();
-const initialLists = (storedLists ?? []).map(normalizeList);
+function persistLists(lists) {
+  const currentDB = loadDB();
+  saveDB({
+    ...currentDB,
+    lists,
+  });
+}
+
+const initialDB = loadDB();
+const initialLists = initialDB.lists.map(normalizeList);
 
 function createListsStore() {
   const { subscribe, update, set } = writable(initialLists);
@@ -138,7 +145,7 @@ function createListsStore() {
     addList(newList) {
       update((lists) => {
         const updatedLists = [normalizeList(newList), ...lists];
-        saveLists(updatedLists);
+        persistLists(updatedLists);
         return updatedLists;
       });
     },
@@ -168,7 +175,7 @@ function createListsStore() {
           return lists;
         }
 
-        saveLists(updatedLists);
+        persistLists(updatedLists);
         return updatedLists;
       });
     },
@@ -192,7 +199,7 @@ function createListsStore() {
           return lists;
         }
 
-        saveLists(updatedLists);
+        persistLists(updatedLists);
         return updatedLists;
       });
     },
@@ -200,7 +207,7 @@ function createListsStore() {
     // Replace all lists after normalizing and save.
     setLists(lists) {
       const normalizedLists = lists.map(normalizeList);
-      saveLists(normalizedLists);
+      persistLists(normalizedLists);
       set(normalizedLists);
     },
   };
