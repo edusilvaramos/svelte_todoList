@@ -98,7 +98,3 @@ For more details, see the [Supabase Auth documentation](https://supabase.com/doc
 - https://github.com/mefechoel/svelte-navigator?tab=readme-ov-file
 - https://supabase.com/docs/reference/javascript/initializing
 - https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API
-
-## Notes
-
-This project uses `svelte-routing`, which works well with Svelte 4. For new projects built with Svelte 5, SvelteKit is generally the recommended routing solution.

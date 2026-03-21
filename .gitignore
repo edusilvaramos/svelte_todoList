@@ -14,8 +14,6 @@ dist-ssr
 
 .embold
 
-projectSvelte.md
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
