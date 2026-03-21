@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'todo-app-db';
+const STORAGE_KEY = import.meta.env.VITE_STORAGE_KEY;
 const STORAGE_VERSION = 1;
 
 export function createEmptyDB() {

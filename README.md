@@ -23,17 +23,23 @@ npm install
 
 ## Environment Variables
 
-This project uses Supabase for authentication. Before starting the app, make sure your environment file includes the following variables:
+
+## Environment Variables
+
+This project uses Supabase for authentication and localStorage for offline persistence. Before starting the app, you must create an environment file with the following variables:
 
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_STORAGE_KEY=your_localstorage_key
 ```
 
 ps: Go to supabase https://supabase.com
 Create a Project, then go to Project Settings > API and copy the URL and anon key.
 
-These values are loaded from `.env` or `.env.local`.
+**VITE_STORAGE_KEY** is required and sets the key used for saving local app data in localStorage. There is no default value set in the code—you must define it in your `.env` file.
+
+These variables are loaded from `.env` or `.env.local`.
 
 ## Build the application:
 ```bash
