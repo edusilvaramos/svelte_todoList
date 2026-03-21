@@ -1,53 +1,40 @@
 import { writable } from "svelte/store";
 import { loadDB, saveDB } from "../../services/localStorageService.js";
 
-// Make sure each task has all fields the app expects.
-function normalizeTask(item) {
-  if (!item || typeof item !== "object") {
-    return item;
-  }
 
+// Ensures each task has all required fields and correct types.
+function normalizeTask(item) {
   return {
     ...item,
     type: "task",
-    recurrence: typeof item.recurrence === "string" ? item.recurrence : "none",
-    done: Boolean(item.done),
-    tags: Array.isArray(item.tags) ? item.tags : [],
+    recurrence: item?.recurrence ?? "none",
+    done: Boolean(item?.done),
+    tags: Array.isArray(item?.tags) ? item.tags : [],
   };
 }
 
-// Choose how to normalize each item: task or nested list.
-function normalizeItem(item) {
-  if (!item || typeof item !== "object") {
-    return item;
-  }
 
-  if (item.type === "list" || Array.isArray(item.items) || Array.isArray(item.itens)) {
-    return normalizeList(item);
-  }
-
-  return normalizeTask(item);
-}
-
-// Keep one standard list format and support old "itens" data.
+// Ensures each list has required fields, valid dates, and normalizes all inner items.
 function normalizeList(list) {
   const now = Date.now();
 
-  let normalizedItems = [];
-
-  if (Array.isArray(list?.items)) {
-    normalizedItems = list.items;
-  } else if (Array.isArray(list?.itens)) {
-    normalizedItems = list.itens;
-  }
   return {
     ...list,
     type: "list",
     createdAt: Number.isFinite(list?.createdAt) ? list.createdAt : now,
     updatedAt: Number.isFinite(list?.updatedAt) ? list.updatedAt : now,
     tags: Array.isArray(list?.tags) ? list.tags : [],
-    items: normalizedItems.map(normalizeItem),
+    items: Array.isArray(list?.items) ? list.items.map(normalizeItem) : [],
   };
+}
+
+
+// Decides if the item is a list or a task and normalizes accordingly.
+function normalizeItem(item) {
+  if (item?.type === "list") {
+    return normalizeList(item);
+  }
+  return normalizeTask(item);
 }
 
 // Update a list by id, even if it is inside another list.
@@ -133,7 +120,9 @@ function persistLists(lists) {
 }
 
 const initialDB = loadDB();
-const initialLists = initialDB.lists.map(normalizeList);
+const initialLists = Array.isArray(initialDB?.lists)
+  ? initialDB.lists.map(normalizeList)
+  : [];
 
 function createListsStore() {
   const { subscribe, update, set } = writable(initialLists);
@@ -213,4 +202,5 @@ function createListsStore() {
   };
 }
 
+// Export a singleton store for app use.
 export const listsStore = createListsStore();

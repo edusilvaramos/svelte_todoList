@@ -1,8 +1,8 @@
 <script>
   import { navigate } from "svelte-routing";
   import { listsStore } from "../lib/stores/listsStore.js";
-  import TaskForm from "../lib/components/items/TaskForm.svelte";
-  import TaskItem from "../lib/components/items/TaskItem.svelte";
+  import TaskForm from "../lib/components/task/TaskForm.svelte";
+  import TaskItem from "../lib/components/task/TaskItem.svelte";
   import CreateListForm from "../lib/components/lists/CreateListForm.svelte";
   import ListCard from "../lib/components/lists/ListCard.svelte";
   import Breadcrumb from "../lib/components/navigation/Breadcrumb.svelte";
