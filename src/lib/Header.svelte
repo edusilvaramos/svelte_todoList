@@ -25,7 +25,7 @@
 
 <nav class="navbar navbar-expand-lg bg-light" data-bs-theme="light">
   <div class="container-fluid">
-    <Link class="navbar-brand" to="/"><img src={logo} alt="Do It Yourself logo" width="180"></Link>
+    <Link class="navbar-brand" to={$user ? '/home' : '/'}><img src={logo} alt="Do It Yourself logo" width="180"></Link>
     
 
     <button
