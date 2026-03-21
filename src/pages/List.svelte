@@ -5,7 +5,6 @@
   import TaskItem from "../lib/components/items/TaskItem.svelte";
   import CreateListForm from "../lib/components/lists/CreateListForm.svelte";
   import ListCard from "../lib/components/lists/ListCard.svelte";
-  import { Link } from "svelte-routing";
   import Breadcrumb from "../lib/components/navigation/Breadcrumb.svelte";
 
   // In Svelte, exported variables are props from the parent/router.
@@ -56,27 +55,68 @@
     })),
   ];
 
-  // Create a task from form data and add it to the current list.
-  function handleTaskSubmit(event) {
-    const { title, notes, dueDate, dueTime, priority, status, recurrence } =
-      event.detail;
+  let showCreateForm = false;
+  // Tracks which task is being edited; null means create mode.
+  let editingTaskId = null;
 
-    const newTask = {
-      id: crypto.randomUUID(),
+  // Create or edit a task from form data and save it in the current list.
+  function handleTaskSubmit(event) {
+    const {
+      taskId,
       title,
       notes,
       dueDate,
       dueTime,
       priority,
       status,
-      done: status === "done",
       recurrence,
-      type: "task",
-    };
+    } = event.detail;
 
-    listsStore.updateList(currentList.id, {
-      items: [...currentList.items, newTask],
-    });
+    if (taskId) {
+      // Edit existing task using the same TaskForm payload.
+      const updatedItems = currentList.items.map((item) => {
+        if (item.type !== "task" || item.id !== taskId) {
+          return item;
+        }
+
+        return {
+          ...item,
+          title,
+          notes,
+          dueDate,
+          dueTime,
+          priority,
+          status,
+          done: status === "done",
+          recurrence,
+        };
+      });
+
+      listsStore.updateList(currentList.id, {
+        items: updatedItems,
+      });
+    } // Create mode: append a new task object to this list.
+      else {
+      const newTask = {
+        id: crypto.randomUUID(),
+        title,
+        notes,
+        dueDate,
+        dueTime,
+        priority,
+        status,
+        done: status === "done",
+        recurrence,
+        type: "task",
+      };
+
+      listsStore.updateList(currentList.id, {
+        items: [...currentList.items, newTask],
+      });
+    }
+
+    showCreateForm = false;
+    editingTaskId = null;
   }
 
   // Mark task done/undone and create next task if it is recurring.
@@ -121,6 +161,34 @@
     });
   }
 
+  // Remove one task from the current list.
+  function handleDeleteTask(event) {
+    const { taskId } = event.detail;
+
+    listsStore.updateList(currentList.id, {
+      items: currentList.items.filter(
+        (item) => !(item.type === "task" && item.id === taskId),
+      ),
+    });
+  }
+// Opens TaskForm in edit mode with the selected task prefilled.
+  
+  function handleEditTask(event) {
+    const { taskId } = event.detail;
+    editingTaskId = taskId;
+    showCreateForm = true;
+  }
+
+  function handleTaskFormCancel() {
+    showCreateForm = false;
+    editingTaskId = null;
+  }
+
+  $: editingTask =
+    currentList?.items?.find(
+      (item) => item.type === "task" && item.id === editingTaskId,
+    ) ?? null;
+
   // Get the next date for daily/weekly/monthly recurrence.
   function getNextDueDate(dueDate, recurrence) {
     if (!dueDate) return "";
@@ -138,31 +206,72 @@
 
     return baseDate.toISOString().slice(0, 10);
   }
-
-  let showCreateForm = false;
-
-  function toggleCreateForm() {
-    showCreateForm = !showCreateForm;
-  }
-
+// Tracks current list/sublist being edited with CreateListForm.
+  
   let showCreateSubListForm = false;
+  let editingListId = null;
 
-  function toggleCreateSubListForm() {
-    showCreateSubListForm = !showCreateSubListForm;
+  function startCreateTask() {
+    editingTaskId = null;
+    showCreateForm = true;
   }
+
+  function startCreateSubList() {
+    editingListId = null;
+    showCreateSubListForm = true;
+  }
+
+  // Opens CreateListForm in edit mode for the current list header data.
+  function handleEditCurrentList() {
+    editingListId = currentList.id;
+    showCreateSubListForm = true;
+  }
+
+  // Receives edit event from ListCard and reuses the same list form.
+  function handleEditSubList(event) {
+    const { listId } = event.detail;
+    editingListId = listId;
+    showCreateSubListForm = true;
+  }
+
+  function handleSubListFormCancel() {
+    showCreateSubListForm = false;
+    editingListId = null;
+  }
+
+  $: editingList =
+    editingListId === currentList?.id
+      ? currentList
+      : (currentList?.items?.find(
+          (item) => item.type === "list" && item.id === editingListId,
+        ) ?? null);
 
   // Build a new sublist object and add it to this list.
   function handleSubListSave(event) {
-    const subList = {
-      ...event.detail,
-      type: "list",
-      items: event.detail.items ?? [],
-    };
+    const listPayload = event.detail;
 
-    listsStore.updateList(currentList.id, {
-      items: [...currentList.items, subList],
-    });
+    if// Edit mode: update only editable list fields.
+       (editingListId) {
+      listsStore.updateList(editingListId, {
+        title: listPayload.title,
+        description: listPayload.description,
+        tags: listPayload.tags,
+      });
+    } // Create mode: insert a new sublist into the current list items.
+      else {
+      const subList = {
+        ...listPayload,
+        type: "list",
+        items: listPayload.items ?? [],
+      };
+
+      listsStore.updateList(currentList.id, {
+        items: [...currentList.items, subList],
+      });
+    }
+
     showCreateSubListForm = false;
+    editingListId = null;
   }
 </script>
 
@@ -175,7 +284,12 @@
 
     <!-- `{#if ...}` renders this block only when condition is true. -->
     {#if currentList}
-      <h1 class="mb-2">{currentList.title}</h1>
+      <div class="d-flex align-items-center justify-content-between gap-3">
+        <h1 class="mb-2">{currentList.title}</h1>
+        <button class="btn btn-sm btn-outline-secondary" on:click={handleEditCurrentList}>
+          Edit List
+        </button>
+      </div>
 
       {#if currentList.description}
         <p class="text-muted">{currentList.description}</p>
@@ -195,28 +309,35 @@
           <h2 class="h5 mb-3">Tasks</h2>
           <button
             class="btn btn-outline-primary me-2"
-            on:click={toggleCreateForm}
+            on:click={startCreateTask}
           >
             New Task
           </button>
 
           <button
             class="btn btn-outline-secondary"
-            on:click={toggleCreateSubListForm}
+            on:click={startCreateSubList}
           >
             New Sublist
           </button>
 
           {#if showCreateForm}
             <!-- `on:submit` listens to a custom event from TaskForm. -->
-            <TaskForm on:submit={handleTaskSubmit} />
+            <TaskForm
+              initialTask={editingTask}
+              isEditing={Boolean(editingTask)}
+              on:submit={handleTaskSubmit}
+              on:cancel={handleTaskFormCancel}
+            />
           {/if}
           {#if showCreateSubListForm}
             <div class="mt-3">
               <!-- `on:save` and `on:cancel` are custom events from child component. -->
               <CreateListForm
+                initialList={editingList}
+                isEditing={Boolean(editingList)}
                 on:save={handleSubListSave}
-                on:cancel={toggleCreateSubListForm}
+                on:cancel={handleSubListFormCancel}
               />
             </div>
           {/if}
@@ -228,9 +349,14 @@
               {#each currentList.items as item (item.id)}
                 {#if item.type === "task"}
                   <!-- `{item}` passes prop with same name: item={item}. -->
-                  <TaskItem {item} on:toggleDone={handleToggleTaskDone} />
+                  <TaskItem
+                    {item}
+                    on:toggleDone={handleToggleTaskDone}
+                    on:deleteTask={handleDeleteTask}
+                    on:editTask={handleEditTask}
+                  />
                 {:else if item.type === "list"}
-                  <ListCard list={item} />
+                  <ListCard list={item} on:edit={handleEditSubList} />
                 {/if}
               {/each}
             </div>

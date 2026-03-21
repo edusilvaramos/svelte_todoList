@@ -1,4 +1,5 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
   import { navigate } from 'svelte-routing';
   import { listsStore } from '../../stores/listsStore.js';
 
@@ -8,6 +9,8 @@
     description: '',
     tags: []
   };
+
+  const dispatch = createEventDispatcher();
 
   // Navigate to the details page for this list.
   function handleOpen() {
@@ -21,6 +24,11 @@
     if (!confirmed) return;
 
     listsStore.deleteList(list.id);
+  }
+
+  // Ask parent page to open the shared list form in edit mode.
+  function handleEdit() {
+    dispatch('edit', { listId: list.id });
   }
 </script>
 
@@ -45,6 +53,10 @@
     <div class="mt-auto d-flex gap-2">
       <button class="btn btn-primary btn-sm" on:click={handleOpen}>
         Open
+      </button>
+
+      <button class="btn btn-outline-secondary btn-sm" on:click={handleEdit}>
+        Edit
       </button>
 
       <button class="btn btn-outline-danger btn-sm" on:click={handleDelete}>

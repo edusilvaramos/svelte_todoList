@@ -11,6 +11,18 @@
       done: event.currentTarget.checked,
     });
   }
+
+  function handleDeleteTask() {
+    dispatch("deleteTask", {
+      taskId: item.id,
+    });
+  }
+
+  function handleEditTask() {
+    dispatch("editTask", {
+      taskId: item.id,
+    });
+  }
 </script>
 
 <li class="list-group-item border-0 px-0 py-2">
@@ -30,17 +42,21 @@
               {item.title}
             </h3>
 
-            {#if item.priority}
-              <span class="badge rounded-pill text-bg-light border">
-                {item.priority}
-              </span>
-            {/if}
+            <div
+              class="d-flex align-items-center gap-2 flex-wrap justify-content-end"
+            >
+              {#if item.priority}
+                <span class="badge rounded-pill text-bg-light border">
+                  {item.priority}
+                </span>
+              {/if}
 
-            {#if item.recurrence && item.recurrence !== "none"}
-              <span class="badge rounded-pill text-bg-light border">
-                {item.recurrence}
-              </span>
-            {/if}
+              {#if item.recurrence && item.recurrence !== "none"}
+                <span class="badge rounded-pill text-bg-light border">
+                  {item.recurrence}
+                </span>
+              {/if}
+            </div>
           </div>
 
           {#if item.notes}
@@ -49,7 +65,7 @@
             </p>
           {/if}
 
-            {#if item.status}
+          {#if item.status}
             <p class:item-done={item.done} class="text-muted mb-2 small">
               {item.status}
             </p>
@@ -68,6 +84,20 @@
           {/if}
         </div>
       </div>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary mt-3 me-2"
+        on:click={handleEditTask}
+      >
+        Edit
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-danger mt-3"
+        on:click={handleDeleteTask}
+      >
+        Delete
+      </button>
     </div>
   </div>
 </li>

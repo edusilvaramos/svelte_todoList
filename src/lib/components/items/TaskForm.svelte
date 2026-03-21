@@ -1,6 +1,10 @@
 <script>
   import { createEventDispatcher } from "svelte";
 
+  // Same form is used for create and edit flows.
+  export let initialTask = null;
+  export let isEditing = false;
+
   const dispatch = createEventDispatcher();
 
   let title = "";
@@ -11,10 +15,49 @@
   let status = "pending";
   let recurrence = "none";
 
+  let loadedTaskId = null;
+
+  function resetForm() {
+    title = "";
+    notes = "";
+    dueDate = "";
+    dueTime = "";
+    priority = "medium";
+    status = "pending";
+    recurrence = "none";
+  }
+
+  function fillForm(task) {
+    title = task?.title ?? "";
+    notes = task?.notes ?? "";
+    dueDate = task?.dueDate ?? "";
+    dueTime = task?.dueTime ?? "";
+    priority = task?.priority ?? "medium";
+    status = task?.status ?? "pending";
+    recurrence = task?.recurrence ?? "none";
+  }
+
+  // Refill form when user switches to edit another task.
+  $: {
+    const currentTaskId = initialTask?.id ?? null;
+
+    if (currentTaskId !== loadedTaskId) {
+      loadedTaskId = currentTaskId;
+
+      if (initialTask) {
+        fillForm(initialTask);
+      } else {
+        resetForm();
+      }
+    }
+  }
+
   function handleSubmit() {
     if (!title.trim()) return;
-
+// Keep taskId in payload so parent can decide create vs update.
+    
     dispatch("submit", {
+      taskId: initialTask?.id ?? null,
       title: title.trim(),
       notes: notes.trim(),
       dueDate,
@@ -24,19 +67,19 @@
       recurrence,
     });
 
-    title = "";
-    notes = "";
-    dueDate = "";
-    dueTime = "";
-    priority = "medium";
-    status = "pending";
-    recurrence = "none";
+    if (!isEditing) {
+      resetForm();
+    }
+  }
+
+  function handleCancel() {
+    dispatch("cancel");
   }
 </script>
 
 <div class="card shadow-sm mt-4">
   <div class="card-body">
-    <h2 class="h5 mb-3">Add a task</h2>
+    <h2 class="h5 mb-3">{isEditing ? "Edit task" : "Add a task"}</h2>
 
     <div class="mb-3">
       <label class="form-label" for="task-title">Title</label>
@@ -109,8 +152,13 @@
       </div>
     </div>
 
-    <button class="btn btn-primary" type="button" on:click={handleSubmit}>
-      Add Task
-    </button>
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary" type="button" on:click={handleSubmit}>
+        {isEditing ? "Save Task" : "Add Task"}
+      </button>
+      <button class="btn btn-outline-secondary" type="button" on:click={handleCancel}>
+        Cancel
+      </button>
+    </div>
   </div>
 </div>
