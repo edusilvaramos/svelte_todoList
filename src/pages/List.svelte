@@ -102,6 +102,10 @@
       if (done && item.recurrence && item.recurrence !== "none") {
         const nextDueDate = getNextDueDate(item.dueDate, item.recurrence);
 
+        if (!nextDueDate || nextDueDate === item.dueDate) {
+          continue;
+        }
+
         updatedItems.push({
           ...item,
           id: crypto.randomUUID(),
@@ -155,7 +159,9 @@
       items: event.detail.items ?? [],
     };
 
-    currentList.items = [...currentList.items, subList];
+    listsStore.updateList(currentList.id, {
+      items: [...currentList.items, subList],
+    });
     showCreateSubListForm = false;
   }
 </script>
@@ -219,7 +225,7 @@
             <p class="text-muted mb-0">No items yet.</p>
           {:else}
             <div class="mt-3 d-flex flex-column gap-3">
-              {#each currentList.items as item}
+              {#each currentList.items as item (item.id)}
                 {#if item.type === "task"}
                   <!-- `{item}` passes prop with same name: item={item}. -->
                   <TaskItem {item} on:toggleDone={handleToggleTaskDone} />
