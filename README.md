@@ -2,6 +2,9 @@
 
 A simple todo list application built with Svelte and Vite.
 
+the code for the application is available at:
+https://github.com/edusilvaramos/svelte_todoList
+
 ## Requirements
 
 - Node.js 16 or later
