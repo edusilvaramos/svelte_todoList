@@ -1,2 +1,2 @@
 
-<h1>page profile</h1>
+<h1>Page profil</h1>

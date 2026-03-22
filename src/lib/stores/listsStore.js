@@ -10,6 +10,8 @@ function normalizeTask(item) {
     recurrence: item?.recurrence ?? "none",
     done: Boolean(item?.done),
     tags: Array.isArray(item?.tags) ? item.tags : [],
+    priority: item?.priority || "Low", // default Low
+    dueDate: item?.dueDate ?? "",
   };
 }
 

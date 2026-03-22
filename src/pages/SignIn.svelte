@@ -33,12 +33,12 @@
       });
 
       if (error) {
-        errorMessage = error.message || 'Error logging in. Please try again.';
+        errorMessage = error.message || 'Erreur lors de la connexion. Veuillez réessayer.';
       } else {
         navigate('/home');
       }
     } catch {
-      errorMessage = 'Error connecting to server. Please try again.';
+      errorMessage = 'Erreur lors de la connexion au serveur. Veuillez réessayer.';
     } finally {
       isLoading = false;
     }
@@ -49,7 +49,7 @@
     infoMessage = '';
 
     if (!email) {
-      errorMessage = 'Enter your email first to recover password.';
+      errorMessage = 'Veuillez saisir votre courrier électronique pour récupérer votre mot de passe.';
       return;
     }
 
@@ -60,12 +60,12 @@
       });
 
       if (error) {
-        errorMessage = error.message || 'Could not send reset email.';
+        errorMessage = error.message || "Impossible d'envoyer le mail de réinitialisation.";
       } else {
-        infoMessage = 'Recovery email sent. Check your inbox.';
+        infoMessage = "Courriel de récupération envoyé. Veuillez consulter votre boîte de réception.";
       }
     } catch {
-      errorMessage = 'Error connecting to server. Please try again.';
+      errorMessage = "Erreur de connexion au serveur. Veuillez réessayer.";
     } finally {
       isLoading = false;
     }
@@ -81,8 +81,8 @@
     <div class="col-md-5">
       <div class="card shadow-lg">
         <div class="card-body p-5">
-          <h1 class="card-title text-center mb-2">Sign In</h1>
-          <p class="text-center text-muted mb-4">Access your task account</p>
+          <h1 class="card-title text-center mb-2">Se connecter</h1>
+          <p class="text-center text-muted mb-4">Accédez à votre compte de tâches</p>
 
           {#if errorMessage}
             <div class="alert alert-danger" role="alert">
@@ -98,20 +98,20 @@
 
           <form on:submit={handleLogin}>
             <div class="mb-3">
-              <label for="email" class="form-label">Email</label>
+              <label for="email" class="form-label">Courriel</label>
               <input
                 type="email"
                 class="form-control"
                 id="email"
                 bind:value={email}
-                placeholder="your@email.com"
+                placeholder="votre@email.com"
                 disabled={isLoading}
                 required
               />
             </div>
 
             <div class="mb-4">
-              <label for="password" class="form-label">Password</label>
+              <label for="password" class="form-label">Mot de passe</label>
               <input
                 type="password"
                 class="form-control"
@@ -128,33 +128,33 @@
                   on:click={handleForgotPassword}
                   disabled={isLoading}
                 >
-                  Forgot password?
+                  Mot de passe oublié ?
                 </button>
               </div>
             </div>
 
             <button
               type="submit"
-              class="btn btn-primary w-100 mb-3"
+              class="button primary w-100"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? 'En train de se connecter...' : 'Se connecter'}
             </button>
           </form>
 
           <div class="d-flex align-items-center my-3">
             <hr class="flex-grow-1" />
-            <span class="mx-3 text-muted">or</span>
+            <span class="mx-3 text-muted">ou</span>
             <hr class="flex-grow-1" />
           </div>
 
           <button
             type="button"
-            class="btn btn-outline-secondary w-100 mb-3"
+            class="button outlineGray w-100"
             on:click={navigateToRegister}
             disabled={isLoading}
           >
-            Create a new account
+            Créer un nouvel compte
           </button>
         </div>
       </div>

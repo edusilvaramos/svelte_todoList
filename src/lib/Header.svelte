@@ -23,7 +23,7 @@
   }
 </script>
 
-<nav class="navbar navbar-expand-lg bg-light" data-bs-theme="light">
+<nav class="navbar navbar-expand-lg bg-light paddingBody" data-bs-theme="light">
   <div class="container-fluid">
     <Link class="navbar-brand" to={$user ? '/home' : '/'}><img src={logo} alt="Do It Yourself logo" width="180"></Link>
     
@@ -43,10 +43,10 @@
       <ul class="navbar-nav me-auto">
         {#if $user}
           <li class="nav-item">
-            <Link class="nav-link {$location.pathname === '/home' ? 'active' : ''}" to="/home">Home</Link>
+            <Link class="nav-link {$location.pathname === '/home' ? 'active' : ''}" to="/home">Accueil</Link>
           </li>
           <li class="nav-item">
-            <Link class="nav-link {$location.pathname.startsWith('/profile') ? 'active' : ''}" to="/profile/{$user.id}">Profile</Link>
+            <Link class="nav-link {$location.pathname.startsWith('/profile') ? 'active' : ''}" to="/profile/{$user.id}">Profil</Link>
           </li>
         {/if}
       </ul>
@@ -56,18 +56,18 @@
             {$user.email}
           </span>
           <button 
-            class="btn btn-outline-danger btn-sm"
+            class="button delete"
             on:click={handleLogout}
             disabled={isLoggingOut}
           >
-            {isLoggingOut ? 'Signing out...' : 'Sign out'}
+            {isLoggingOut ? 'En train de se déconnecter..' : 'Se déconnecter'}
           </button>
         {:else}
-          <Link to="/" class="btn btn-primary btn-sm">
-            Sign In
+          <Link to="/" class="button primary">
+            Se connecter
           </Link>
-          <Link to="/register" class="btn btn-outline-primary btn-sm">
-            Sign Up
+          <Link to="/register" class="button secondary">
+            Créer une compte
           </Link>
         {/if}
       </div>

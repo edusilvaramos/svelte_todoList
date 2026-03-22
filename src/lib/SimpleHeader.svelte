@@ -37,10 +37,10 @@
     <div class="collapse navbar-collapse" id="navbarSimple">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <Link class="nav-link {$location.pathname === '/home' ? 'active' : ''}" to="/home">Home</Link>
+          <Link class="nav-link {$location.pathname === '/home' ? 'active' : ''}" to="/home">Accueil</Link>
         </li>
         <li class="nav-item">
-          <Link class="nav-link {$location.pathname === '/list' ? 'active' : ''}" to="/list">My Lists</Link>
+          <Link class="nav-link {$location.pathname === '/list' ? 'active' : ''}" to="/list">Me Listes</Link>
         </li>
       </ul>
       <div class="d-flex align-items-center gap-2">
@@ -50,7 +50,7 @@
             on:click={handleLogout}
             disabled={isLoggingOut}
           >
-            {isLoggingOut ? 'Logging out...' : 'Logout'}
+            {isLoggingOut ? 'En train de se déconnecter..' : 'Se déconnecter'}
           </button>
         {/if}
       </div>

@@ -2,6 +2,7 @@
   import ListGrid from '../lib/components/lists/ListGrid.svelte';
   import CreateListForm from '../lib/components/lists/CreateListForm.svelte';
   import { listsStore } from '../lib/stores/listsStore.js';
+  import Search from '/src/lib/components/Search.svelte';
 
   let showCreateForm = false;
   // null = create mode, value = edit mode with shared CreateListForm.
@@ -49,19 +50,19 @@
   }
 </script>
 
-<section class="py-4">
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<Search />
+
+<section>
+  <div>
+    <div class="flex spaceBetween alignCenter">
       <div>
-        <h1 class="mb-1">My Lists</h1>
-        <p class="text-muted mb-0">Organize your tasks by list.</p>
+        <h1>Mes listes</h1>
+        <p>Organizez vos tâches par listes.</p>
       </div>
 
-      <button class="btn btn-primary" on:click={toggleCreateForm}>
-        Create List
-      </button>
+      <button class="button primary createButton" on:click={toggleCreateForm}>Créer liste</button>
     </div>
-
+    <br>
     {#if showCreateForm}
       <CreateListForm
         initialList={editingList}
@@ -75,3 +76,9 @@
     <ListGrid lists={$listsStore} on:edit={handleEditList} />
   </div>
 </section>
+
+<style>
+.createButton {
+  height: 48px;
+}
+</style>

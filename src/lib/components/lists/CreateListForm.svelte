@@ -78,19 +78,20 @@
   }
 </script>
 
+<br>
 <div class="card shadow-sm mb-4">
   <div class="card-body">
-    <h2 class="h5 mb-3">{isEditing ? "Edit List" : "New List"}</h2>
+    <h2 class="h5 mb-3">{isEditing ? "Modifier la liste" : "Nouvelle liste"}</h2>
 
     <div class="mb-3">
-      <label for="title" class="form-label">Title</label>
+      <label for="title" class="form-label">Titre</label>
       <!-- `bind:value` keeps input and variable in sync (2-way binding). -->
       <input
         id="title"
         class="form-control"
         type="text"
         bind:value={newTitle}
-        placeholder="Example: Weekend tasks"
+        placeholder="Ex : tâches du week-end"
       />
     </div>
 
@@ -102,7 +103,7 @@
         class="form-control"
         rows="3"
         bind:value={newDescription}
-        placeholder="Write a short description"
+        placeholder="Écrivez une courte description"
       ></textarea>
     </div>
 
@@ -113,15 +114,15 @@
         class="form-control"
         type="text"
         bind:value={newTags}
-        placeholder="work, urgent, personal"
+        placeholder="travail, urgent, personnel"
       />
-      <div class="form-text">Separate tags with commas.</div>
+      <div class="form-text">Séparez les tags par des virgules.</div>
     </div>
 
     <div class="d-flex gap-2">
-      <button class="btn btn-primary" on:click={handleSave}> Save </button>
-      <button class="btn btn-outline-secondary" on:click={handleCancel}>
-        Cancel
+      <button class="button primary" on:click={handleSave}> Sauvegarder </button>
+      <button class="button outlineGray" on:click={handleCancel}>
+        Annuler
       </button>
     </div>
   </div>

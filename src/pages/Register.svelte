@@ -14,25 +14,25 @@
     errorMessage = '';
 
     if (!email || !password || !confirmPassword) {
-      errorMessage = 'Please fill in all fields.';
+      errorMessage = 'Veuillez remplir tous les champs.';
       isLoading = false;
       return;
     }
 
     if (!email.includes('@')) {
-      errorMessage = 'Please enter a valid email.';
+      errorMessage = "Veuillez saisir une adresse e-mail valide.";
       isLoading = false;
       return;
     }
 
     if (password.length < 6) {
-      errorMessage = 'Password must be at least 6 characters.';
+      errorMessage = "Le mot de passe doit comporter au moins 6 caractères.";
       isLoading = false;
       return;
     }
 
     if (password !== confirmPassword) {
-      errorMessage = 'Passwords do not match.';
+      errorMessage = "Les mots de passe ne correspondent pas.";
       isLoading = false;
       return;
     }
@@ -44,12 +44,12 @@
       });
 
       if (error) {
-        errorMessage = error.message || 'Error creating account. Please try again.';
+        errorMessage = error.message || "Erreur lors de la création du compte. Veuillez réessayer.";
       } else {
         navigate('/');
       }
     } catch {
-      errorMessage = 'Error connecting to server. Please try again.';
+      errorMessage = "Erreur de connexion au serveur. Veuillez réessayer.";
     } finally {
       isLoading = false;
     }
@@ -65,8 +65,8 @@
     <div class="col-md-5">
       <div class="card shadow-lg">
         <div class="card-body p-5">
-          <h1 class="card-title text-center mb-2">Create Account</h1>
-          <p class="text-center text-muted mb-4">Join us to manage your tasks</p>
+          <h1 class="card-title text-center mb-2">Créer un compte</h1>
+          <p class="text-center text-muted mb-4">Rejoignez-nous pour gérer vos tâches</p>
 
           {#if errorMessage}
             <div class="alert alert-danger" role="alert">
@@ -82,14 +82,14 @@
                 class="form-control"
                 id="email"
                 bind:value={email}
-                placeholder="your@email.com"
+                placeholder="votre@email.com"
                 disabled={isLoading}
                 required
               />
             </div>
 
             <div class="mb-3">
-              <label for="password" class="form-label">Password</label>
+              <label for="password" class="form-label">Mot de passe</label>
               <input
                 type="password"
                 class="form-control"
@@ -99,11 +99,11 @@
                 disabled={isLoading}
                 required
               />
-              <small class="form-text text-muted">Minimum 6 characters</small>
+              <small class="form-text text-muted">Minimum 6 caractères</small>
             </div>
 
             <div class="mb-4">
-              <label for="confirmPassword" class="form-label">Confirm Password</label>
+              <label for="confirmPassword" class="form-label">Confirmez le mot de passe</label>
               <input
                 type="password"
                 class="form-control"
@@ -117,26 +117,26 @@
 
             <button
               type="submit"
-              class="btn btn-primary w-100 mb-3"
+              class="button primary w-100"
               disabled={isLoading}
             >
-              {isLoading ? 'Creating account...' : 'Create Account'}
+              {isLoading ? 'En train de créer le compte...' : 'Créer un compte'}
             </button>
           </form>
 
           <div class="d-flex align-items-center my-3">
             <hr class="flex-grow-1" />
-            <span class="mx-3 text-muted">or</span>
+            <span class="mx-3 text-muted">ou</span>
             <hr class="flex-grow-1" />
           </div>
 
           <button
             type="button"
-            class="btn btn-outline-secondary w-100 mb-3"
+            class="button outlineGray w-100"
             on:click={navigateToSignIn}
             disabled={isLoading}
           >
-            Already have an account
+            J'ai déjà un compte
           </button>
         </div>
       </div>

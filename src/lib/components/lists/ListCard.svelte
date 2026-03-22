@@ -30,38 +30,60 @@
   function handleEdit() {
     dispatch('edit', { listId: list.id });
   }
+
+  function countItems(list) {
+  if (!list?.items) return 0;
+
+  let count = 0;
+  for (const item of list.items) {
+    if (item.type === "task") {
+      count += 1;
+    } else if (item.type === "list") {
+      count += 1 + countItems(item); // count the sublist itself + its items recursively
+    }
+  }
+  return count;
+}
 </script>
 
-<div class="card h-100 shadow-sm">
-  <div class="card-body d-flex flex-column">
-    <h5 class="card-title">{list.title}</h5>
-
-    {#if list.description}
-      <p class="card-text text-muted">
-        {list.description}
-      </p>
-    {/if}
-
+<br>
+<div class="itemCard">
+  <div class="flex spaceBetween">
+    <img alt="list icon" class="icon" src="/src/assets/listIcon.svg" /> 
     {#if list.tags?.length}
-      <div class="d-flex flex-wrap gap-2 mt-3 mb-3">
-        {#each list.tags as tag}
-          <span class="badge bg-light text-dark border">{tag}</span>
-        {/each}
-      </div>
-    {/if}
-
-    <div class="mt-auto d-flex gap-2">
-      <button class="btn btn-primary btn-sm" on:click={handleOpen}>
-        Open
-      </button>
-
-      <button class="btn btn-outline-secondary btn-sm" on:click={handleEdit}>
-        Edit
-      </button>
-
-      <button class="btn btn-outline-danger btn-sm" on:click={handleDelete}>
-        Delete
-      </button>
+    <div>
+      {#each list.tags as tag}
+        <span class="tag secondary marginSides">{tag}</span>
+      {/each}
     </div>
+  {/if}   
+  </div>
+  <h3>{list.title}</h3>
+  <span>{countItems(list)} items</span>
+
+  {#if list.description}
+    <p>{list.description}</p>
+  {/if}
+
+  
+  <div class="buttons flex">
+    <button class="button primary" on:click={handleOpen}>Ouvrir</button>
+    <button class="button outlineGray" on:click={handleEdit}>Éditer</button>
+    <button class="button delete" on:click={handleDelete}>Supprimer</button>
   </div>
 </div>
+
+<style>
+.icon {
+  background-color: #D3E5FE;
+  padding: 6px;
+  border-radius: 8px;
+  margin-bottom: 32px;
+}
+
+.buttons {
+  gap: 8px;
+  margin-top: 12px;
+}
+
+</style>

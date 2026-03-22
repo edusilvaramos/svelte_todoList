@@ -14,7 +14,7 @@
           </li>
         {:else}
           <li class="breadcrumb-item">
-            <Link to={item.href}>{item.label}</Link>
+            <Link class="navItem" to={item.href}>{item.label}</Link>
           </li>
         {/if}
       {/each}

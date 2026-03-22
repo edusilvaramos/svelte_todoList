@@ -6,6 +6,7 @@
   import CreateListForm from "../lib/components/lists/CreateListForm.svelte";
   import ListCard from "../lib/components/lists/ListCard.svelte";
   import Breadcrumb from "../lib/components/navigation/Breadcrumb.svelte";
+    import Search from "../lib/components/Search.svelte";
 
   // In Svelte, exported variables are props from the parent/router.
   export let id;
@@ -85,10 +86,11 @@
           notes,
           dueDate,
           dueTime,
-          priority,
+          priority: priority || "Low", // default
           status,
           done: status === "done",
           recurrence,
+          tags: event.detail.tags || [],
         };
       });
 
@@ -97,18 +99,19 @@
       });
     } // Create mode: append a new task object to this list.
       else {
-      const newTask = {
-        id: crypto.randomUUID(),
-        title,
-        notes,
-        dueDate,
-        dueTime,
-        priority,
-        status,
-        done: status === "done",
-        recurrence,
-        type: "task",
-      };
+        const newTask = {
+          id: crypto.randomUUID(),
+          title,
+          notes,
+          dueDate,
+          dueTime,
+          priority: priority || "Low", // default if missing
+          status,
+          done: status === "done",
+          recurrence,
+          type: "task",
+          tags: event.detail.tags || [],
+        };
 
       listsStore.updateList(currentList.id, {
         items: [...currentList.items, newTask],
@@ -273,99 +276,201 @@
     showCreateSubListForm = false;
     editingListId = null;
   }
+
+  let sortMode = "date"; // "date" | "priority"
+  let hideDone = false;
+  function getPriorityValue(item) {
+    if (!item.priority) return 0;
+    switch (item.priority) {
+      case "high": return 3;
+      case "medium": return 2;
+      case "low": return 1;
+      default: return 0;
+    }
+  }
+
+  function filterItems(items, hideDoneFlag) {
+    if (!items) return [];
+
+    return items
+      .map(item => {
+        if (item.type === "list") {
+          return {
+            ...item,
+            items: filterItems(item.items, hideDoneFlag),
+          };
+        }
+
+        if (item.type === "task") {
+          return !hideDoneFlag || !item.done ? item : null;
+        }
+
+        return item;
+      })
+      .filter(Boolean);
+  }
+
+  function sortItems(items, mode) {
+    if (!items) return [];
+
+    return items
+      .map((item) => {
+        // Recursively sort sublist items
+        if (item.type === "list") {
+          return { ...item, items: sortItems(item.items, mode) };
+        }
+        return item;
+      })
+      .sort((a, b) => {
+        // Always keep lists and tasks together: optional, can change order
+        if (a.type === "list" && b.type === "task") return -1; // lists first
+        if (a.type === "task" && b.type === "list") return 1;
+
+        // Compare tasks
+        if (a.type === "task" && b.type === "task") {
+          if (mode === "date") {
+            const dateA = a.dueDate ? new Date(a.dueDate) : new Date(0);
+            const dateB = b.dueDate ? new Date(b.dueDate) : new Date(0);
+            return dateA - dateB; // earliest first
+          }
+          if (mode === "priority") {
+            return getPriorityValue(b) - getPriorityValue(a); // High first
+          }
+        }
+        return 0; // equal
+      });
+  }
+
+  function getDisplayedItems(items, hideDoneFlag, sortModeFlag) {
+  const filtered = filterItems(items, hideDoneFlag);
+  return sortItems(filtered, sortModeFlag);
+}
+
+
+// Reactive displayed items
+$: displayedItems = getDisplayedItems(currentList?.items || [], hideDone, sortMode);
 </script>
 
-<section class="py-4">
-  <Breadcrumb items={breadcrumbItems} />Breadcrumb
-  <div class="container">
-    <button class="btn btn-outline-secondary btn-sm mb-4" on:click={goBack}>
-      Back to Home
-    </button>
-
-    <!-- `{#if ...}` renders this block only when condition is true. -->
-    {#if currentList}
-      <div class="d-flex align-items-center justify-content-between gap-3">
-        <h1 class="mb-2">{currentList.title}</h1>
-        <button class="btn btn-sm btn-outline-secondary" on:click={handleEditCurrentList}>
-          Edit List
-        </button>
+<section>
+  <div class="flex spaceBetween alignCenter">
+    <Breadcrumb items={breadcrumbItems} />
+    <button class="button outlineGray" on:click={goBack}>Retourner à l'accueil</button>
+  </div>
+  <Search />
+  <div>
+    <div>
+      <div>
+        <!-- `{#if ...}` renders this block only when condition is true. -->
+        {#if currentList}
+          <div class="flex spaceBetween alignCenter">
+            <h1>{currentList.title}</h1>
+            {#if currentList.tags?.length}
+              <div>
+                <!-- `{#each ...}` is Svelte loop syntax. -->
+                {#each currentList.tags as tag}
+                  <span class="tag secondary marginSides">{tag}</span>
+                {/each}
+              </div>
+            {/if}
+          </div>
+          <br>
+          {#if currentList.description}
+            <p>{currentList.description}</p>
+          {/if}
+        {:else}
+          <h1>List not found</h1>
+          <p>No list matches this id.</p>
+        {/if}
+        <br>
+        <button class="button outlineGray" on:click={handleEditCurrentList}>Modifier la liste</button>
       </div>
-
-      {#if currentList.description}
-        <p class="text-muted">{currentList.description}</p>
-      {/if}
-
-      {#if currentList.tags?.length}
-        <div class="d-flex flex-wrap gap-2 mt-3 mb-4">
-          <!-- `{#each ...}` is Svelte loop syntax. -->
-          {#each currentList.tags as tag}
-            <span class="badge bg-light text-dark border">{tag}</span>
-          {/each}
+    </div>
+    <div>
+        <br>
+        <h2>Tâches</h2>
+        <br>
+        <label class="flex alignCenter" style="margin-bottom: 1rem;">
+          <input type="checkbox" bind:checked={hideDone} />
+          <span style="margin-left: 0.5rem;">Masquer tâches finies</span>
+        </label>
+        <!-- Sort control -->
+        <div class="flex alignCenter spaceBetween" style="margin-bottom: 1rem;">
+          <span>Trier par:</span>
+          <select bind:value={sortMode}>
+            <option value="date">Date</option>
+            <option value="priority">Priorité</option>
+          </select>
         </div>
-      {/if}
 
-      <div class="card shadow-sm mt-4">
-        <div class="card-body">
-          <h2 class="h5 mb-3">Tasks</h2>
-          <button
-            class="btn btn-outline-primary me-2"
-            on:click={startCreateTask}
-          >
-            New Task
-          </button>
-
-          <button
-            class="btn btn-outline-secondary"
-            on:click={startCreateSubList}
-          >
-            New Sublist
-          </button>
-
-          {#if showCreateForm}
-            <!-- `on:submit` listens to a custom event from TaskForm. -->
-            <TaskForm
-              initialTask={editingTask}
-              isEditing={Boolean(editingTask)}
-              on:submit={handleTaskSubmit}
-              on:cancel={handleTaskFormCancel}
+        <button class="button primary" on:click={startCreateTask}>Nouvelle tâche</button>
+        <button class="button outlineAccent" on:click={startCreateSubList}>Nouvelle sous-liste</button>
+        
+        {#if showCreateForm}
+          <!-- `on:submit` listens to a custom event from TaskForm. -->
+          <TaskForm
+            initialTask={editingTask}
+            isEditing={Boolean(editingTask)}
+            on:submit={handleTaskSubmit}
+            on:cancel={handleTaskFormCancel}
+          />
+        {/if}
+        {#if showCreateSubListForm}
+          <div>
+            <!-- `on:save` and `on:cancel` are custom events from child component. -->
+            <CreateListForm
+              initialList={editingList}
+              isEditing={Boolean(editingList)}
+              on:save={handleSubListSave}
+              on:cancel={handleSubListFormCancel}
             />
-          {/if}
-          {#if showCreateSubListForm}
-            <div class="mt-3">
-              <!-- `on:save` and `on:cancel` are custom events from child component. -->
-              <CreateListForm
-                initialList={editingList}
-                isEditing={Boolean(editingList)}
-                on:save={handleSubListSave}
-                on:cancel={handleSubListFormCancel}
-              />
-            </div>
-          {/if}
-
-          {#if currentList.items.length === 0}
-            <p class="text-muted mb-0">No items yet.</p>
-          {:else}
-            <div class="mt-3 d-flex flex-column gap-3">
-              {#each currentList.items as item (item.id)}
-                {#if item.type === "task"}
-                  <!-- `{item}` passes prop with same name: item={item}. -->
-                  <TaskItem
-                    {item}
-                    on:toggleDone={handleToggleTaskDone}
-                    on:deleteTask={handleDeleteTask}
-                    on:editTask={handleEditTask}
-                  />
-                {:else if item.type === "list"}
-                  <ListCard list={item} on:edit={handleEditSubList} />
-                {/if}
-              {/each}
-            </div>
-          {/if}
-        </div>
-      </div>
-    {:else}
-      <h1 class="mb-2">List not found</h1>
-      <p class="text-muted">No list matches this id.</p>
-    {/if}
+          </div>
+        {/if}
+        
+        {#if currentList.items.length === 0}
+          <br><br>
+          <p>Aucun article pour l'instant.</p>
+        {:else}
+          <div>
+            {#each displayedItems as item (item.id)}
+              {#if item.type === "task"}
+                <!-- `{item}` passes prop with same name: item={item}. -->
+                <br>
+                <TaskItem
+                  {item}
+                  on:toggleDone={handleToggleTaskDone}
+                  on:deleteTask={handleDeleteTask}
+                  on:editTask={handleEditTask}
+                />
+              {:else if item.type === "list"}
+                <ListCard list={item} on:edit={handleEditSubList} />
+              {/if}
+            {/each}
+          </div>
+        {/if}
+    </div>
+    
   </div>
 </section>
+
+<style>
+
+  input[type=checkbox] {
+      /* Double-sized Checkboxes */
+      -ms-transform: scale(1.5); /* IE */
+      -moz-transform: scale(1.5); /* FF */
+      -webkit-transform: scale(1.5); /* Safari and Chrome */
+      -o-transform: scale(1.5); /* Opera */
+      transform: scale(1.5);
+      padding: 10px;
+    }
+
+  select {
+    outline: none;
+    padding: 8px;
+    border-radius: 6px;
+  }
+  select:focus {
+    border: 1px solid #5149D7;
+    
+  }
+</style>
