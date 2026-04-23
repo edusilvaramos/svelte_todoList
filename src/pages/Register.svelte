@@ -1,17 +1,37 @@
 <script>
-  import { supabase } from '../lib/auth/supabaseClient.js';
-  import { navigate } from 'svelte-routing';
+  import { supabase } from "../lib/auth/supabaseClient.js";
+  import { navigate } from "svelte-routing";
 
-  let email = '';
-  let password = '';
-  let confirmPassword = '';
+  let email = "";
+  let password = "";
+  let confirmPassword = "";
   let isLoading = false;
-  let errorMessage = '';
+  let errorMessage = "";
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function getRegisterErrorMessage(error) {
+    const errorText = (error?.message || "").toLowerCase();
+
+    if (error?.status === 429 || errorText.includes("rate limit")) {
+      return "Trop de tentatives d'inscription. Veuillez patienter quelques minutes avant de réessayer.";
+    }
+
+    if (errorText.includes("already registered") || errorText.includes("already been registered")) {
+      return "Cet e-mail est déjà utilisé. Veuillez vous connecter.";
+    }
+
+    if (errorText.includes("is invalid") || errorText.includes("email address") && errorText.includes("invalid")) {
+      return "Adresse e-mail invalide. Utilisez une adresse réelle, par exemple nom@domaine.com.";
+    }
+
+    return error?.message || "Erreur lors de la création du compte. Veuillez réessayer.";
+  }
 
   async function handleRegister(e) {
     e.preventDefault();
     isLoading = true;
-    errorMessage = '';
+    errorMessage = "";
+    const normalizedEmail = email.trim().toLowerCase();
 
     if (!email || !password || !confirmPassword) {
       errorMessage = 'Veuillez remplir tous les champs.';
@@ -38,15 +58,20 @@
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const { error } = await supabase.auth.signUp(
+        {
+          email: normalizedEmail,
+          password,
+        },
+        {
+          emailRedirectTo: "http://localhost:5173/",
+        },
+      )
 
       if (error) {
         errorMessage = error.message || "Erreur lors de la création du compte. Veuillez réessayer.";
       } else {
-        navigate('/');
+        navigate("/");
       }
     } catch {
       errorMessage = "Erreur de connexion au serveur. Veuillez réessayer.";
@@ -56,7 +81,7 @@
   }
 
   function navigateToSignIn() {
-    navigate('/');
+    navigate("/");
   }
 </script>
 
