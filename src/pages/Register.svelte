@@ -69,7 +69,7 @@
       )
 
       if (error) {
-        errorMessage = error.message || "Erreur lors de la création du compte. Veuillez réessayer.";
+        errorMessage = getRegisterErrorMessage(error);
       } else {
         navigate("/");
       }
